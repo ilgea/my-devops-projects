@@ -1,0 +1,38 @@
+---
+# tasks file for nodejs
+    - name: create build directory # image'ı build edeceğim. Bir directory oluşturuyoruz.
+      file:
+        path: /home/ec2-user/nodejs
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+    # at this point do not forget change DB_HOST env variable for postgresql node
+    - name: copy files to nodejs node
+      copy: 
+        src: server/ # *** "/" unutma 
+        dest: /home/ec2-user/nodejs
+
+    - name: copy the dockerfile
+      copy: 
+        src: Dockerfile
+        dest: /home/ec2-user/nodejs
+
+    - name: remove container and image if exist
+      shell: "docker ps -q --filter 'name=ilgea_nodejs' && docker stop ilgea_nodejs && docker rm -fv ilgea_nodejs && docker image rm -f ilgeacw/nodejs || echo 'Not Found'"
+
+    - name: build container image
+      docker_image:
+        name: ilgeacw/nodejs
+        build:
+          path: /home/ec2-user/nodejs
+        source: build
+        state: present
+
+    - name: create nodejs docker container
+      docker_container:
+        name: ilgea_nodejs
+        image: ilgeacw/nodejs
+        state: started
+        ports:
+          - "5000:5000"

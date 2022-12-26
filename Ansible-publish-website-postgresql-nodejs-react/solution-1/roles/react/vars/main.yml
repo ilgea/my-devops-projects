@@ -1,0 +1,5 @@
+---
+# vars file for react
+container_path: /home/ec2-user/react
+container_name: oliver_react
+image_name: olivercw/react

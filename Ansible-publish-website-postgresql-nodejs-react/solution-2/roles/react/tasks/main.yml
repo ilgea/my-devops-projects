@@ -1,0 +1,43 @@
+---
+# tasks file for react
+    - name: create build directory
+      file:
+        path: /home/ec2-user/react
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: copy files to the react node
+      copy: 
+        src: client/
+        dest: /home/ec2-user/react
+
+    - name: copy the dockerfile
+      copy: 
+        src: Dockerfile
+        dest: /home/ec2-user/react
+
+    - name: remove container and image if exist
+      shell: "docker ps -q --filter 'name=ilgea_react' && docker stop ilgea_react && docker rm -fv ilgea_react && docker image rm -f ilgeacw/react || echo 'Not Found'"
+
+    - name: build container image
+      docker_image:
+        name: ilgeacw/react
+        build:
+          path: /home/ec2-user/react
+        source: build
+        state: present
+
+    - name: create react docker container
+      docker_container:
+        name: ilgea_react
+        image: ilgeacw/react
+        state: started
+        ports:
+          - "3000:3000"
+      register: container_info
+
+    - name: print the container info
+      debug:
+        var: container_info

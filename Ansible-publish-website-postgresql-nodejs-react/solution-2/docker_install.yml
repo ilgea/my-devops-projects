@@ -1,0 +1,60 @@
+- name: remove first and then install docker
+  hosts: _development
+  become: true
+  tasks:
+    - name: update packages
+      yum:
+        name: '*'
+        state: latest
+
+    - name: uninstall old version docker
+      yum: 
+        name: "{{ item }}"
+        state: removed
+      loop:
+        - docker
+        - docker-client
+        - docker-client-latest
+        - docker-common
+        - docker-latest
+        - docker-latest-logrotate
+        - docker-logrotate
+        - docker-engine
+
+
+#     - name: Install yum-utils
+#       yum:
+#         name: yum-utils # docker repo için yum-utils indirmemiz gerekiyordu.
+#         state: latest
+    
+#     - name: add docker repo # docker'ı indirdik.
+#       get_url:
+#         url: https://download.docker.com/linux/centos/docker-ce.repo
+#         dest: /etc/yum.repos.d/docker-ce.repo 
+
+#     - name: install docker # docker'ı kuruyoruz.
+#       package:
+#         name: docker-ce
+#         state: latest
+
+#     - name: install pip  # docker_image çalıştırma için sdk gerekliymiş. onun içinde pip gerekli.
+#       package:
+#         name: python3-pip
+#         state: present
+
+#     - name: install docker sdk
+#       pip: 
+#         name: docker
+
+#     - name: add ec2-user to docekr group
+#       user:
+#         name: ec2-user
+#         groups: docker
+#         append: yes # usermod -a -G docker ec2-user. append yes dememizin sebebi
+# # ec2-user diğer gruplardan çıkmasın.
+
+#     - name: start docker service
+#       systemd:
+#         name: docker
+#         enabled: yes
+#         state: started

@@ -1,0 +1,49 @@
+---
+# tasks file for postgre
+    - name: create build directory
+      file:
+        path: /home/ec2-user/postgresql  # böyle bir dizin oluşturduk. temiz oldun diye.
+        state: directory # klasör oluşturuyoruz. yani postgresql'in klasör olduğunu belirtiyoruz.
+        owner: root
+        group: root
+        mode: "0755"  # klasçrünün iznini belirtebiliyoruz.
+
+    - name: copy the sql script
+      copy:
+        src: init.sql # bizim dizin,
+        dest: /home/ec2-user/postgresql  # yönetilen dizin.
+
+    - name: copy the dockerfile
+      copy:
+        src: Dockerfile # yerel dizinden Dockerfile'ı kopyala diyoruz.
+        dest: /home/ec2-user/postgresql # Dockerfile'ın yönetilen dizinde kopyalanacığı yer.
+
+    - name: remove ilgea_postgre container and ilgeacw/postgre if exists
+      shell: "docker ps -q --filter 'name=oliver_postgre' && docker stop oliver_postgre && docker rm -fv oliver_postgre && docker image rm -f olivercw/postgre || echo 'Not Found'"
+# ilk önce listeliyoruuz, sonra stop ediyoruz, sonra container ve bağlı olan bir volume varsa onu da siliyoruz. image'ı siliyoruz. eski image'ı ve container'ı silen, sonra şimdi oluşturacağım container'ı ce image'ı kullanan bir task. Aşağıda yeni bir container oluşturuyoruz.
+
+    - name: build container image
+      docker_image:
+        name: ilgeacw/postgre # image'a bu ismi verdik.
+        build:
+          path: /home/ec2-user/postgresql # build edilecek Dockerfle buraya gelecek.
+        source: build
+        state: present
+# docker build -t ilgeacw/postgre . nin module hali.
+
+    - name: create postgresql docker container
+      docker_container:
+        name: ilgea_postgre  # bu isimde container oluşturuyor.
+        image: ilgeacw/postgre # image'ı yukarıda oluşturduk. local'de olmasaydı Dockerhub'dan çekecekti. Orada da olmasaydı hata dönerdi.
+        state: started
+        ports: 
+        - "5432:5432"
+        env:
+          POSTGRES_PASSWORD: "{{ password }}"
+        volumes:
+          - /db-data:/var/lib/postgresql/data # data'yı tutmamamız için volume bağlamamız lazım. resmi sitesinde yazıyor neresi olduğu. db-data diye bir klasör oluşturuyoruz onu da resmi olan yere bağlıyoruz.
+    #   register: container_info # bilgileri buna yazdırıyoruz.
+    
+    # - name: print the container info
+    #   debug:  # yazdırdığımız bilgileri ekrana yazdırıyoruz.
+    #     var: container_info

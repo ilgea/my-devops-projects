@@ -1,0 +1,113 @@
+- name: configure postgresql node
+  hosts: _ansible_postgresql
+  become: true
+  vars_files:  # şifreyi burdan al diyoruz.
+    - secret.yml
+  tasks:
+    - name: update packages
+      yum:
+        name: '*'
+        state: latest
+
+    - name: uninstall old version docker
+      yum: 
+        name: "{{ item }}"
+        state: removed
+      loop:
+        - docker
+        - docker-client
+        - docker-client-latest
+        - docker-common
+        - docker-latest
+        - docker-latest-logrotate
+        - docker-logrotate
+        - docker-engine
+
+
+    - name: Install yum-utils
+      yum:
+        name: yum-utils # docker repo için yum-utils indirmemiz gerekiyordu.
+        state: latest
+    
+    - name: add docker repo # docker'ı indirdik.
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo 
+
+    - name: install docker # docker'ı kuruyoruz.
+      package:
+        name: docker-ce
+        state: latest
+
+    - name: install pip  # docker_image çalıştırma için sdk gerekliymiş. onun içinde pip gerekli.
+      package:
+        name: python3-pip
+        state: present
+
+    - name: install docker sdk
+      pip: 
+        name: docker
+
+    - name: add ec2-user to docekr group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes # usermod -a -G docker ec2-user. append yes dememizin sebebi
+# ec2-user diğer gruplardan çıkmasın.
+
+    - name: start docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: create build directory
+      file:
+        path: /home/ec2-user/postgresql  # böyle bir dizin oluşturduk. temiz oldun diye.
+        state: directory # klasör oluşturuyoruz. yani postgresql'in klasör olduğunu belirtiyoruz.
+        owner: root
+        group: root
+        mode: "0755"  # klasçrünün iznini belirtebiliyoruz.
+
+    - name: copy the sql script
+      copy:
+        src: /home/ilgea/GIT/study/ansible-cozum/ansible-project/postgres/init.sql # bizim dizin,
+        dest: /home/ec2-user/postgresql  # yönetilen dizin.
+
+    - name: copy the dockerfile
+      copy:
+        src: /home/ilgea/GIT/study/ansible-cozum/ansible-project/postgres/Dockerfile # yerel dizinden Dockerfile'ı kopyala diyoruz.
+        dest: /home/ec2-user/postgresql # Dockerfile'ın yönetilen dizinde kopyalanacığı yer.
+
+    - name: remove ilgea_postgre container and ilgeacw/postgre if exists
+      shell: "docker ps -q --filter 'name=oliver_postgre' && docker stop oliver_postgre && docker rm -fv oliver_postgre && docker image rm -f olivercw/postgre || echo 'Not Found'"
+# ilk önce listeliyoruuz, sonra stop ediyoruz, sonra container ve bağlı olan bir volume varsa onu da siliyoruz. image'ı siliyoruz. eski image'ı ve container'ı silen, sonra şimdi oluşturacağım container'ı ce image'ı kullanan bir task. Aşağıda yeni bir container oluşturuyoruz.
+
+    - name: build container image
+      docker_image:
+        name: olivercw/postgre # image'a bu ismi verdik.
+        build:
+          path: /home/ec2-user/postgresql # build edilecek Dockerfle buraya gelecek.
+        source: build
+        state: present
+# docker build -t ilgeacw/postgre . nin module hali.
+
+    - name: create postgresql docker container
+      docker_container:
+        name: oliver_postgre  # bu isimde container oluşturuyor.
+        image: olivercw/postgre # image'ı yukarıda oluşturduk. local'de olmasaydı Dockerhub'dan çekecekti. Orada da olmasaydı hata dönerdi.
+        state: started
+        ports: 
+        - "5432:5432"
+        env:
+          POSTGRES_PASSWORD: "{{ password }}"
+        volumes:
+          - /db-data:/var/lib/postgresql/data # data'yı tutmamamız için volume bağlamamız lazım. resmi sitesinde yazıyor neresi olduğu. db-data diye bir klasör oluşturuyoruz onu da resmi olan yere bağlıyoruz.
+      register: container_info # bilgileri buna yazdırıyoruz.
+    
+    - name: print the container info
+      debug:  # yazdırdığımız bilgileri ekrana yazdırıyoruz.
+        var: container_info
+
+
+        
