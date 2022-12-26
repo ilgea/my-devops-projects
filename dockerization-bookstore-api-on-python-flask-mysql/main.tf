@@ -24,7 +24,7 @@ data "aws_ami" "amazon-linux-2" {
 resource "aws_instance" "bookstore-server" {
   instance_type   = "t2.micro"
   ami             = data.aws_ami.amazon-linux-2.id
-  key_name        = "firstkey"
+  key_name        = "keyname"
  vpc_security_group_ids = [ aws_security_group.server-sg.id ]
   tags = {
     "Name" = "bookstore-webserver"
