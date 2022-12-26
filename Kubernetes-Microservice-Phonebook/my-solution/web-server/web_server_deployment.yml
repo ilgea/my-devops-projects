@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+spec:
+  selector:
+    matchLabels:
+      app: my-webserver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-webserver
+    spec:
+      containers:
+      - name: my-server
+        image: ilgea/phonebook-web-server:1.0
+        ports:
+        - containerPort: 80
+        env:
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: MYSQL_PASSWORD
+        envFrom:
+          - configMapRef:
+              name: server-config

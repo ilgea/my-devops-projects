@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-search
+  template:
+    metadata:
+      labels:
+        app: my-search
+    spec:
+      containers:
+      - name: my-search
+        image: ilgea/phonebook-result-server:1.0
+        ports:
+        - containerPort: 80
+        env:
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: MYSQL_PASSWORD
+        envFrom:
+          - configMapRef:
+              name: server-config
