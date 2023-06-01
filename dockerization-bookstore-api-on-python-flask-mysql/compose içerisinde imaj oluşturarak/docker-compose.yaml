@@ -1,0 +1,28 @@
+version: "3.7"
+services:
+  database:
+    container_name: database
+    image: mysql:5.7
+    environment:
+        MYSQL_ROOT_PASSWORD: C123c
+        MYSQL_USER: ilgea
+        MYSQL_PASSWORD: ilgea_pass
+        MYSQL_DATABASE: bookstore_db
+    networks:
+      - mynetwork
+
+  myapp:
+    container_name: myapp
+    restart: on-failure # konteynır bağlantı hatası verip kapandığında tekrar çalıştırıyoruz ki database tam olarak ayağa kalkdığında bağlantı sağlanabilsin. Aksi takdirde bağlantı sağlanmayacaktır.
+    build:
+      context: .  # Dockerfile'ın bulunduğu konumda çalıştırılmalı. Aksi takdirde dosya yolu yazılmalı.
+      dockerfile: Dockerfile  # image'ı burada build edioruz. Daha önce build etmeye gerek kalmıyor.
+    depends_on:
+      - database
+    ports:
+      - 80:80  # local'de çalıştırırsan http://localhost/ yazman yeterlidir.
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
