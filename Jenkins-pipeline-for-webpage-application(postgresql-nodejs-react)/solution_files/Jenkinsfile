@@ -4,7 +4,6 @@ pipeline {
         terraform 'terraform'
 }
 
-
     environment {
         PATH=sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
         AWS_REGION = "us-east-1"
@@ -12,15 +11,15 @@ pipeline {
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         APP_REPO_NAME = "clarusway-repo/cw-todo-app"
         APP_NAME = "todo"
-
+        // HOME_FOLDER = "/home/ec2-user"
+        // GIT_FOLDER = sh(script:'echo ${GIT_URL} | sed "s/.*\\///;s/.git$//"', returnStdout:true).trim()
     }
-
 
     stages {
 
         stage('Create Infrastructure for the App') {
             steps {
-                echo 'Creating Infrastructure for the App on AWS Cloud'
+                echo 'Creating Infrastructure for the App on AWS Cloud' //çıktıya stage'in ismini yazdırıyor.
                 sh 'terraform init'
                 sh 'terraform apply --auto-approve'
             }
@@ -38,7 +37,6 @@ pipeline {
                 """
             }
         }
-
 
         stage('Build App Docker Image') {
             steps {
@@ -70,18 +68,15 @@ pipeline {
             }
         }
 
-
         stage('wait the instance') {
             steps {
                 script {
                     echo 'Waiting for the instance'
                     id = sh(script: 'aws ec2 describe-instances --filters Name=tag-value,Values=ansible_postgresql Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text',  returnStdout:true).trim()
-                    sh 'aws ec2 wait instance-status-ok --instance-ids $id'
+                    sh 'aws ec2 wait instance-status-ok --instance-ids $id' //Instance konsolunda bulunan -Status check- kısmını kontrol ediyor.
                 }
             }
         }
-
-
 
         stage('Deploy the App') {
             steps {
@@ -90,9 +85,8 @@ pipeline {
                 sh 'ansible --version'
                 sh 'ansible-inventory --graph'
                 ansiblePlaybook credentialsId: 'mykey', disableHostKeyChecking: true, installation: 'ansible', inventory: 'inventory_aws_ec2.yml', playbook: 'docker_project.yml'
-             }
+            }
         }
-
 
         stage('Destroy the infrastructure'){
             steps{
@@ -109,7 +103,6 @@ pipeline {
                 """
             }
         }
-
     }
 
     post {
@@ -118,7 +111,6 @@ pipeline {
             sh 'docker image prune -af'
         }
         failure {
-
             echo 'Delete the Image Repository on ECR due to the Failure'
             sh """
                 aws ecr delete-repository \
@@ -131,8 +123,7 @@ pipeline {
         }
     }
 
-
-    }
+}
 
 
 
