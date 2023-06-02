@@ -1,5 +1,6 @@
 # FROM alpine:3.18
 FROM python:3.7-alpine
+# Alpine kullandık çünkü 5 MB dır ve gereksiz componentleri yoktur, mesela bash yoktur.
 COPY requirements.txt .
 # requirements.txt dosyasını konteynır'ın root'una kopyalıyoruz.
 RUN pip install -r requirements.txt
