@@ -50,8 +50,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: hoop123
       MYSQL_DATABASE: bookstore_db
-      MYSQL_USER: clarusway
-      MYSQL_PASSWORD: Clarusway_1
+      MYSQL_USER: ilgea
+      MYSQL_PASSWORD: ilgea_pass
       
   mybookstore:
     image: ilgea/bookstore:latest
