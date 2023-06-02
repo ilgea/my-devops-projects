@@ -1,0 +1,1 @@
+--->  Daha önce local'de oluşturulup Docker Hub'a gönderilmiş olan ilgea/bookstore:latest tag'lı imajdan oluşturuluyor.
