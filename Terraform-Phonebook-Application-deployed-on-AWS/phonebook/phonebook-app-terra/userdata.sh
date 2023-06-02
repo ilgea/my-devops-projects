@@ -9,9 +9,6 @@ echo "${aws_s3_bucket.hoop.bucket}" > /home/ec2-user/dbserver.endpoint
 # TOKEN="xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 # cd /home/ec2-user && git clone https://$TOKEN@github.com/ilgea/karakalem.git
 # python3 /home/ec2-user/karakalem/phonebook-app.py
-# # cd /home/ec2-user && git clone https://$TOKEN@github.com/ilgea/karakalem.git
-# # FOLDER="https://$TOKEN@raw.githubusercontent.com/serdarcw/phonebook_app/master"
-# # FOLDER="https://$TOKEN@raw.githubusercontent.com/ilgea/karakalem/main"
 # FOLDER="https://$TOKEN@raw.githubusercontent.com/ilgea/karakalem/main"
 # curl -s --create-dirs -o "/home/ec2-user/templates/index.html" -L "$FOLDER"/templates/index.html
 # curl -s --create-dirs -o "/home/ec2-user/templates/add-update.html" -L "$FOLDER"/templates/add-update.html
