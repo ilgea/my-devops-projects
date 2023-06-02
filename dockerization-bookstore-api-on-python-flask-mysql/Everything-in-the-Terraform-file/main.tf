@@ -20,7 +20,6 @@ data "aws_ami" "amazon-linux-2" {
   }
 }
 
-
 resource "aws_instance" "bookstore-server" {
   instance_type   = "t2.micro"
   ami             = data.aws_ami.amazon-linux-2.id
@@ -50,8 +49,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: hoop123
       MYSQL_DATABASE: bookstore_db
-      MYSQL_USER: ilgea
-      MYSQL_PASSWORD: ilgea_pass
+      MYSQL_USER: clarusway
+      MYSQL_PASSWORD: Clarusway_1
       
   mybookstore:
     image: ilgea/bookstore:latest
