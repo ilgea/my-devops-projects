@@ -3,14 +3,6 @@ data "aws_vpc" "selected" {
 
 }
 
-data "aws_subnets" "example" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.selected.id]
-  }
-
-}
-
 data "aws_ami" "amazon-linux-2" {
   owners      = ["amazon"]
   most_recent = true
