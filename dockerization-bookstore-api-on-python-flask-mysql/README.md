@@ -77,6 +77,14 @@ Bookstore Web API Application aims to create a bookstore web service using Docke
 
 ## Expected Outcome
 
+![Bookstore App Main Page](./uygulama.png)
+
+![Bookstore App Third Page](./books3.png)
+
+## Solution Steps
+
+![cozum-asamalari](./cozum-asamalari.png)
+
 ### At the end of the project, following topics are to be covered;
 
 - MySQL Database Configuration
