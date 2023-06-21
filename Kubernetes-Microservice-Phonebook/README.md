@@ -146,6 +146,8 @@ SECRETS AND CONFIGMAP
 
 ## Expected Outcome
 
+![Project Outcome](./uygulama.png)
+
 ### At the end of the project, following topics are to be covered;
 
 - MySQL Database Configuration
