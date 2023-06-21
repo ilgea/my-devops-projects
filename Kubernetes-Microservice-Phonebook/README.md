@@ -148,6 +148,10 @@ SECRETS AND CONFIGMAP
 
 ![Project Outcome](./uygulama.png)
 
+## Solution Steps
+
+![Solution Steps](./cozum-asamalari-k8s-phonebook.png)
+
 ### At the end of the project, following topics are to be covered;
 
 - MySQL Database Configuration
