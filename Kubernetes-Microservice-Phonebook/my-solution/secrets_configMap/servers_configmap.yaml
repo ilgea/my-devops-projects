@@ -5,4 +5,4 @@ metadata:
 data:
   MYSQL_DATABASE_HOST: mysql-service
   MYSQL_DATABASE: phonebook
-  MYSQL_USER: clarusway
+  MYSQL_USER: ilgea
