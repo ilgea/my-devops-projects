@@ -83,7 +83,7 @@ Bookstore Web API Application aims to create a bookstore web service using Docke
 
 ## Solution Steps
 
-![cozum-asamalari](./cozum-asamalari.png)
+![cozum-asamalari](./cozum-asamalari-bookstore-dockerization.png)
 
 ### At the end of the project, following topics are to be covered;
 
